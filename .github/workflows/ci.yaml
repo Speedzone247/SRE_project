@@ -1,0 +1,34 @@
+name: CI - Build and Publish Image
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "app/api/**"
+      - ".github/workflows/ci.yaml"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: app/api
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/civic-api:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/civic-api:dev

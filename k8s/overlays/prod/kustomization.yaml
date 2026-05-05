@@ -1,0 +1,16 @@
+resources:
+  - ../../base
+
+images:
+  - name: civic-api
+    newName: ghcr.io/YOUR_GITHUB_USERNAME/sre-gitops-platform/civic-api
+    newTag: prod
+
+patches:
+  - target:
+      kind: Deployment
+      name: civic-api
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2

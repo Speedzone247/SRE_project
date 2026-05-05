@@ -1,0 +1,31 @@
+name: GitOps - Update Dev Image Tag
+
+on:
+  workflow_run:
+    workflows: ["CI - Build and Publish Image"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  update-manifest:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update dev image tag
+        run: |
+          cd k8s/overlays/dev
+          kustomize edit set image civic-api=ghcr.io/${{ github.repository }}/civic-api:${{ github.event.workflow_run.head_sha }}
+
+      - name: Commit GitOps manifest update
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add k8s/overlays/dev/kustomization.yaml
+          git commit -m "gitops: promote dev image ${{ github.event.workflow_run.head_sha }}" || echo "No changes"
+          git push
