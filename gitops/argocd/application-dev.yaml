@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_GITHUB_USERNAME/sre-gitops-platform.git
+    repoURL: https://github.com/Speedzone247/SRE_project.git
     targetRevision: main
     path: k8s/overlays/dev
   destination:
